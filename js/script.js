@@ -267,10 +267,18 @@ window.addEventListener('DOMContentLoaded', () => {
             
             //вариант 1 - отправка данных через FormData
             const formData = new FormData(form);    //получает данные из формы (элементы input) и формирует словарь внутри себя для передачи данных
-  
+            const object = {};
+            //преобразуем данные из FormData в словарь
+            formData.forEach((value, key) => {
+                object[key] = value;
+            })
+
             fetch('server.php', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(object)    //преобразуем словарь в Json-объект
             })
             .then(data => data.text())
             .then(data => {
