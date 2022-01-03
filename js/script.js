@@ -265,45 +265,25 @@ window.addEventListener('DOMContentLoaded', () => {
             //form.appendChild(statusMessage);
             form.insertAdjacentElement('afterend', statusMessage);  //вставляет новый блок в форму после последнего элемента - afterend
             
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-            //заголовок можно не добавлять, если происходит отправка данных с помощью объекта FormData
-            //для объекта типа Json нужен заголовок
-            //request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            
             //вариант 1 - отправка данных через FormData
             const formData = new FormData(form);    //получает данные из формы (элементы input) и формирует словарь внутри себя для передачи данных
-            // console.log(formData.get('name'));
-            // console.log(formData.get('phone'));
-            //request.send(formData);   
-            
-            //вариант 2 - отправка данных через JSON
-            request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            const object = {};
-            //из FormData перенесем данные в созданный выше object
-            formData.forEach(function(value, key) {
-                object[key] = value;
-            });
-            const json = JSON.stringify(object);    //преобразуем данные из объекта в Json
-            request.send(json);
-
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
-                    //statusMessage.textContent = message.success;
-                    // form.reset();   //очистим форму
-                    // setTimeout(() => {
-                    //     statusMessage.remove(); //удалим состояние добавленное под формой
-                    // }, 3000);
-                    showThanksModal(message.success);
-                    statusMessage.remove();
-                    form.reset();   
-                } else {
-                    statusMessage.textContent = message.failure;
-                    console.log(`${request.status}`);
-                    showThanksModal(message.failure);
-                }
+  
+            fetch('server.php', {
+                method: 'POST',
+                body: formData
             })
+            .then(data => data.text())
+            .then(data => {
+                console.log(data);
+                showThanksModal(message.success);
+                statusMessage.remove();
+            })
+            .catch(() => {
+                showThanksModal(message.failure);
+            })
+            .finally(() => {
+                form.reset();
+            });
         })
     }
 
@@ -330,5 +310,19 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 2000);    
     }
 
+    // //тестовый GET-запрос на сервер с Json-данными через промисы
+    // fetch('https://jsonplaceholder.typicode.com/todos/1')
+    // .then(response => response.json())
+    // .then(json => console.log(json));
+
+    // //тестовый POST-запрос на сервер с JSON-данными через промисы
+    // fetch('https://jsonplaceholder.typicode.com/posts', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-type': 'application-json'
+    //     }
+    // })
+    //     .then(response => response.json())
+    //     .then(json => console.log(json))    
     
 })
