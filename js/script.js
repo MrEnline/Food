@@ -215,26 +215,27 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    new MenuCard('img/tabs/vegy.jpg', 
-                 'vegy', 
-                 'Меню "Фитнес"',
-                 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-                 '229',
-                 '.menu .container',
-                 'menu__item', 'big').render();
-    new MenuCard('img/tabs/elite.jpg',
-                 'elite',
-                 'Меню "Премиум"',
-                 'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-                 '550',
-                 '.menu .container',
-                 'menu__item').render();
-    new MenuCard('img/tabs/post.jpg', 
-                 'post', 
-                 'Меню "Постное"',
-                 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-                 '430',
-                 '.menu .container').render();
+    const getResource = async (url) => {
+        //fetch возвращает объект типа Promise после выполненного запроса на сервер и полученного ответа с него
+        //await говорит нам о том, что надо дождаться результата выполнения операции, прежде чем выполнять код дальше
+        const result = await fetch(url);
+        if (!result.ok){
+            throw new Error(`Could not fetch ${url}. Status: ${result.status}`)
+        }
+        return await result.json(); //у Promise есть метод json
+    }
+
+    getResource('http://localhost:3000/menu')
+        .then(data => {
+            console.log(typeof(data));
+            data.forEach(({img, altimg, title, descr, price}) => {
+                new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+            })
+            // data.forEach((obj) => {
+            //     console.log(obj);
+            //     new MenuCard(obj.img, obj.altimg, obj.title, obj.descr, obj.price, '.menu .container').render();
+            // })
+        })
 
     //Forms
     const forms = document.querySelectorAll('form');
@@ -246,10 +247,26 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     forms.forEach(item => {
-        postData(item);
+        bindPostData(item);
     })
 
-    function postData(form) {
+    //async говорит нам о том, что функция будет выполняться асинхронно
+    //data - данные, которые отправляем на сервер
+    const postData = async (url, data) => {
+        //fetch возвращает объект типа Promise после выполненного запроса на сервер и полученного ответа с него
+        //await говорит нам о том, что надо дождаться результата выполнения операции, прежде чем выполнять код дальше
+        const result = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: data 
+        });
+
+        return await result.json(); //у Promise есть метод json
+    }
+
+    function bindPostData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault(); 
 
@@ -269,18 +286,17 @@ window.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(form);    //получает данные из формы (элементы input) и формирует словарь внутри себя для передачи данных
             const object = {};
             //преобразуем данные из FormData в словарь
-            formData.forEach((value, key) => {
-                object[key] = value;
-            })
+            // formData.forEach((value, key) => {
+            //     object[key] = value;
+            // })
 
-            fetch('server.php', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json'
-                },
-                body: JSON.stringify(object)    //преобразуем словарь в Json-объект
-            })
-            .then(data => data.text())
+            //преобразуем данные из FormData в JSON другим методом
+            //метод fromEntries из массива массивов формирует объект в виде ключ-значение
+            //метод stringify уже из объекта формирует JSON
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
+
+            postData('http://localhost:3000/requests', json)
+//            .then(data => data.text()) данные преобразования не нужны, потому что они выполняются в функции postData
             .then(data => {
                 console.log(data);
                 showThanksModal(message.success);
@@ -331,6 +347,10 @@ window.addEventListener('DOMContentLoaded', () => {
     //     }
     // })
     //     .then(response => response.json())
-    //     .then(json => console.log(json))    
+    //     .then(json => console.log(json))
     
+    fetch('http://localhost:3000/menu')
+        .then(data => data.json())
+        .then(res => console.log(res));
+
 })
