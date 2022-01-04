@@ -226,15 +226,15 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     //1-й способ формирования карточки путем получения данных с JSON-server
-    getResource('http://localhost:3000/menu')
-        .then(data => {
-            data.forEach(({img, altimg, title, descr, price}) => {
-                new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
-            })
-            // data.forEach((obj) => {
-            //     new MenuCard(obj.img, obj.altimg, obj.title, obj.descr, obj.price, '.menu .container').render();
-            // })
-        })
+    // getResource('http://localhost:3000/menu')
+    //     .then(data => {
+    //         data.forEach(({img, altimg, title, descr, price}) => {
+    //             new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+    //         })
+    //         // data.forEach((obj) => {
+    //         //     new MenuCard(obj.img, obj.altimg, obj.title, obj.descr, obj.price, '.menu .container').render();
+    //         // })
+    //     })
 
     //2-й способ формирования карточки путем получения данных с JSON-server
     // getResource('http://localhost:3000/menu').then(data => createCard(data));
@@ -255,7 +255,15 @@ window.addEventListener('DOMContentLoaded', () => {
     //                             </div>`;
     //         document.querySelector('.menu .container').appendChild(element);
     //     })
-    // }    
+    // }  
+    
+    //3-й способ - использование библиотеки axios (подключение в файле index.html)
+    axios.get('http://localhost:3000/menu')
+        .then(data => {
+                    data.data.forEach(({img, altimg, title, descr, price}) => {
+                        new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+                    })
+                });
 
     //Forms
     const forms = document.querySelectorAll('form');
