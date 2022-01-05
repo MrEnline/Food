@@ -362,6 +362,112 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 2000);    
     }
 
+    //slider - мой вариант
+    // const slider = document.querySelector('.offer__slider'),
+    //       left = slider.querySelector('.offer__slider-prev'),
+    //       right = slider.querySelector('.offer__slider-next'),
+    //       current = slider.querySelector('#current'),
+    //       total = slider.querySelector('#total'),
+    //       allSlides = slider. querySelectorAll('.offer__slide');
+
+    // function hideAllSlides() {
+    //     allSlides.forEach(item => {
+    //         item.classList.add('hide');
+    //     })
+        
+    // }
+    // hideAllSlides();
+
+    // function showSlide(index = 0) {
+    //     allSlides[index].classList.add('show', 'fade');
+    //     allSlides[index].classList.remove('hide');
+    // }
+    // showSlide();
+    
+    // function changeSlide(upDownState) {
+    //     let count = (+current.textContent) - 1;
+    //     switch(upDownState) {
+    //         case 1:
+    //             if (count == 3){
+    //                 count = 0;
+    //             } else {
+    //                 count++;
+    //             }
+
+    //             break;
+    //         case 2:
+    //             if (count == 0) {
+    //                 count = 3
+    //             } else {
+    //                 count--;
+    //             }
+    //             break;
+    //         default:
+    //             return;        
+    //     }
+    //     hideAllSlides();
+    //     showSlide(count);
+    //     current.textContent = getZero(count + 1);
+    // }
+
+    // left.addEventListener('click', (event) => {
+    //     changeSlide(2);
+    // });
+
+    // right.addEventListener('click', (event) => {
+    //     changeSlide(1);
+    // });
+
+    //вариант Петровича - хороший пример. Взять на заметку
+    // Slider
+    let slideIndex = 1;
+    const slides = document.querySelectorAll('.offer__slide'),
+        prev = document.querySelector('.offer__slider-prev'),
+        next = document.querySelector('.offer__slider-next'),
+        total = document.querySelector('#total'),
+        current = document.querySelector('#current');
+
+    showSlides(slideIndex);
+
+    if (slides.length < 10) {
+        total.textContent = `0${slides.length}`;
+    } else {
+        total.textContent = slides.length;
+    }
+
+    function showSlides(n) {
+        if (n > slides.length) {
+            slideIndex = 1;
+        }
+        if (n < 1) {
+            slideIndex = slides.length;
+        }
+
+        slides.forEach((item) => item.style.display = 'none');
+
+        slides[slideIndex - 1].style.display = 'block'; // Как ваша самостоятельная работа - переписать на использование классов show/hide
+        
+        if (slides.length < 10) {
+            current.textContent =  `0${slideIndex}`;
+        } else {
+            current.textContent =  slideIndex;
+        }
+    }
+
+    function plusSlides (n) {
+        showSlides(slideIndex += n);
+    }
+
+    prev.addEventListener('click', function(){
+        plusSlides(-1);
+    });
+
+    next.addEventListener('click', function(){
+        plusSlides(1);
+    });
+
+
+
     // //тестовый GET-запрос на сервер с Json-данными через промисы
     // fetch('https://jsonplaceholder.typicode.com/todos/1')
     // .then(response => response.json())
