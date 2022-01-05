@@ -420,51 +420,119 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //вариант Петровича - хороший пример. Взять на заметку
     // Slider
+    let offset = 0;
     let slideIndex = 1;
     const slides = document.querySelectorAll('.offer__slide'),
         prev = document.querySelector('.offer__slider-prev'),
         next = document.querySelector('.offer__slider-next'),
         total = document.querySelector('#total'),
-        current = document.querySelector('#current');
-
-    showSlides(slideIndex);
-
-    if (slides.length < 10) {
+        current = document.querySelector('#current'),
+        slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+        width = window.getComputedStyle(slidesWrapper).width,
+        slidesFields = slidesWrapper.querySelector('.offer__slider-inner');
+    
+    if (slideIndex < 10) {
+        current.textContent = `0${slideIndex}`;
         total.textContent = `0${slides.length}`;
-    } else {
-        total.textContent = slides.length;
-    }
+    }else {
+        current.textContent = `${slideIndex}`;
+        total.textContent = `${slides.length}`;
+    };
 
-    function showSlides(n) {
-        if (n > slides.length) {
+    slidesFields.style.width = 100 * slides.length + '%';   //задаем ширину объекту .offer__slider-inner равную ширине всех элементов
+    slidesFields.style.transition = '0.5s all';
+    slidesFields.style.display = 'flex';    //устанавливаем разметку типа flex
+    
+    slidesWrapper.style.overflow = 'hidden'; //прячем то что должно быть спрятано
+
+    slides.forEach(slide => {
+        slide.style.width = width; //установим каждому элементу ширину полученную выше
+    });
+
+    next.addEventListener('click', () => {
+        //если смещение offset равно достигному концу в списке по горизонтали
+        if (offset == +(width.slice(0, width.length - 2)) * (slides.length - 1)) {
+            offset = 0;
+        } else {
+            offset += +(width.slice(0, width.length - 2)); //увеличиваем смещение на ширину одного элемента
+        }
+
+        slidesFields.style.transform = `translateX(-${offset}px)`;
+
+        if (slideIndex == slides.length) {
             slideIndex = 1;
-        }
-        if (n < 1) {
-            slideIndex = slides.length;
+            current.textContent = slideIndex;
+        }else {
+            slideIndex++;
         }
 
-        slides.forEach((item) => item.style.display = 'none');
-
-        slides[slideIndex - 1].style.display = 'block'; // Как ваша самостоятельная работа - переписать на использование классов show/hide
-        
         if (slides.length < 10) {
             current.textContent =  `0${slideIndex}`;
         } else {
             current.textContent =  slideIndex;
         }
-    }
+    })
 
-    function plusSlides (n) {
-        showSlides(slideIndex += n);
-    }
+    prev.addEventListener('click', () => {
+        if (offset == 0) {
+            offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+        } else {
+            offset -= +width.slice(0, width.length - 2);
+        }
 
-    prev.addEventListener('click', function(){
-        plusSlides(-1);
-    });
+        slidesFields.style.transform = `translateX(-${offset}px)`;
 
-    next.addEventListener('click', function(){
-        plusSlides(1);
-    });
+        if (slideIndex == 1) {
+            slideIndex = slides.length;
+        }else {
+            slideIndex--;
+        }
+
+        if (slides.length < 10) {
+            current.textContent =  `0${slideIndex}`;
+        } else {
+            current.textContent =  slideIndex;
+        }
+    })
+
+    // showSlides(slideIndex);
+
+    // if (slides.length < 10) {
+    //     total.textContent = `0${slides.length}`;
+    // } else {
+    //     total.textContent = slides.length;
+    // }
+
+    // function showSlides(n) {
+    //     if (n > slides.length) {
+    //         slideIndex = 1;
+    //     }
+    //     if (n < 1) {
+    //         slideIndex = slides.length;
+    //     }
+
+    //     slides.forEach((item) => item.style.display = 'none');
+
+    //     slides[slideIndex - 1].style.display = 'block'; // Как ваша самостоятельная работа - переписать на использование классов show/hide
+        
+    //     if (slides.length < 10) {
+    //         current.textContent =  `0${slideIndex}`;
+    //     } else {
+    //         current.textContent =  slideIndex;
+    //     }
+    // }
+
+    // function plusSlides (n) {
+    //     showSlides(slideIndex += n);
+    // }
+
+    // prev.addEventListener('click', function(){
+    //     plusSlides(-1);
+    // });
+
+    // next.addEventListener('click', function(){
+    //     plusSlides(1);
+    // });
 
 
 
