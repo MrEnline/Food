@@ -423,6 +423,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let offset = 0;
     let slideIndex = 1;
     const slides = document.querySelectorAll('.offer__slide'),
+        slider = document.querySelector('.offer__slider'),
         prev = document.querySelector('.offer__slider-prev'),
         next = document.querySelector('.offer__slider-next'),
         total = document.querySelector('#total'),
@@ -449,6 +450,51 @@ window.addEventListener('DOMContentLoaded', () => {
         slide.style.width = width; //установим каждому элементу ширину полученную выше
     });
 
+    slider.style.position = 'relative '; ///!!!
+
+    const indicators = document.createElement('ol'),    //создадим список без элементов
+          dots = [];
+    indicators.classList.add('carousel-indicators');
+    //можно добавить через инлайн-стили, а можно в css-файл. Это один из вариантов
+    indicators.style.cssText = `
+                                position: absolute;
+                                right: 0;
+                                bottom: 0;
+                                left: 0;
+                                z-index: 15;
+                                display: flex;
+                                justify-content: center;
+                                margin-right: 15%;
+                                margin-left: 15%;
+                                list-style: none;
+                                `;
+    slider.append(indicators);
+
+    for(let i=0; i < slides.length; i++) {
+        const dot = document.createElement('li');   //создаем внунтренние элементы в списке
+        dot.setAttribute('data-slide-to', i + 1);
+        dot.style.cssText = `
+                            box-sizing: content-box;
+                            flex: 0 1 auto;
+                            width: 30px;
+                            height: 6px;
+                            margin-right: 3px;
+                            margin-left: 3px;
+                            cursor: pointer;
+                            background-color: #fff;
+                            background-clip: padding-box;
+                            border-top: 10px solid transparent;
+                            border-bottom: 10px solid transparent;
+                            opacity: .5;
+                            transition: opacity .6s ease;
+                            `;
+        if (i == 0) {
+            dot.style.opacity = `1`;
+        }
+        dots.push(dot); //добавим в общий массив все индикаторы для дальнейших манипуляций
+        indicators.append(dot);
+    }
+
     next.addEventListener('click', () => {
         //если смещение offset равно достигному концу в списке по горизонтали
         if (offset == +(width.slice(0, width.length - 2)) * (slides.length - 1)) {
@@ -466,11 +512,8 @@ window.addEventListener('DOMContentLoaded', () => {
             slideIndex++;
         }
 
-        if (slides.length < 10) {
-            current.textContent =  `0${slideIndex}`;
-        } else {
-            current.textContent =  slideIndex;
-        }
+        setCurrentValue();
+        setOpacityDot();
     })
 
     prev.addEventListener('click', () => {
@@ -488,12 +531,35 @@ window.addEventListener('DOMContentLoaded', () => {
             slideIndex--;
         }
 
+        setCurrentValue();
+        setOpacityDot();
+    })
+
+    dots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            const indexDot = e.target.getAttribute('data-slide-to');
+            slideIndex = indexDot;
+            offset = +width.slice(0, width.length - 2) * (slideIndex - 1);  //рассчитаем смещение
+            slidesFields.style.transform = `translateX(-${offset}px)`;
+            setCurrentValue();
+            setOpacityDot();
+        })
+    })
+
+    function setCurrentValue() {
         if (slides.length < 10) {
             current.textContent =  `0${slideIndex}`;
         } else {
             current.textContent =  slideIndex;
         }
-    })
+    }
+
+    function setOpacityDot() {
+        dots.forEach(dot => dot.style.opacity = '.5');  //установим всем индикаторам прозрачность 50%
+        dots[slideIndex - 1].style.opacity = 1;           //установим активному индикатору видимость равную 100%
+    }
+
+
 
     // showSlides(slideIndex);
 
