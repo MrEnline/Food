@@ -497,10 +497,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     next.addEventListener('click', () => {
         //если смещение offset равно достигному концу в списке по горизонтали
-        if (offset == +(width.slice(0, width.length - 2)) * (slides.length - 1)) {
+        if (offset == getNumber(width) * (slides.length - 1)) {
             offset = 0;
         } else {
-            offset += +(width.slice(0, width.length - 2)); //увеличиваем смещение на ширину одного элемента
+            offset += getNumber(width); //увеличиваем смещение на ширину одного элемента
         }
 
         slidesFields.style.transform = `translateX(-${offset}px)`;
@@ -518,9 +518,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
     prev.addEventListener('click', () => {
         if (offset == 0) {
-            offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+            offset = getNumber(width) * (slides.length - 1);
         } else {
-            offset -= +width.slice(0, width.length - 2);
+            offset -= getNumber(width);
         }
 
         slidesFields.style.transform = `translateX(-${offset}px)`;
@@ -539,7 +539,7 @@ window.addEventListener('DOMContentLoaded', () => {
         dot.addEventListener('click', (e) => {
             const indexDot = e.target.getAttribute('data-slide-to');
             slideIndex = indexDot;
-            offset = +width.slice(0, width.length - 2) * (slideIndex - 1);  //рассчитаем смещение
+            offset = getNumber(width) * (slideIndex - 1);  //рассчитаем смещение
             slidesFields.style.transform = `translateX(-${offset}px)`;
             setCurrentValue();
             setOpacityDot();
@@ -559,7 +559,9 @@ window.addEventListener('DOMContentLoaded', () => {
         dots[slideIndex - 1].style.opacity = 1;           //установим активному индикатору видимость равную 100%
     }
 
-
+    function getNumber(str) {
+        return +(width.replace(/\D/g, ''));
+    }
 
     // showSlides(slideIndex);
 
