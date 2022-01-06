@@ -605,9 +605,41 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //Calculate calories
     const result = document.querySelector('.calculating__result span');
-    let sex = 'female', 
+    let sex, 
         height, weight, age,
+        ratio;
+    
+    //считаем значения из localStorage, если они там есть
+    //если значений нет, то запишем по умолчанию в переменные и localStorage
+    if (localStorage.getItem('sex')) {
+        sex = localStorage.getItem('sex');
+    } else {
+        sex = 'female';
+        localStorage.setItem('sex', sex);
+    }
+    if (localStorage.getItem('ratio')) {
+        ratio = +localStorage.getItem('ratio');
+    } else {
         ratio = 1.375;
+        localStorage.setItem('ratio', ratio);
+    }    
+
+    //инициализация элементов путем добавления активного класса на основе данных из localStorage
+    function initLocalStorage(selector, activeClass) {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+            element.classList.remove(activeClass);
+            if (element.getAttribute('id') === localStorage.getItem('sex')) {
+                element.classList.add(activeClass);
+            }
+            if (element.getAttribute('data-ratio') === localStorage.getItem('ratio')) {
+                element.classList.add(activeClass);
+            }
+        })
+    }    
+
+    initLocalStorage('#gender div', 'calculating__choose-item_active');
+    initLocalStorage('.calculating__choose_big div', 'calculating__choose-item_active');
 
     function calcTotal() {
         if (!height || !weight || !age) {
@@ -625,14 +657,16 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function getStaticInformation(parentSelector, activeClass) {
         //получим все элементы div с определенным классом в родителе
-        const elements = document.querySelectorAll(`${parentSelector} div`);
+        const elements = document.querySelectorAll(parentSelector);
         //навесим на каждый элемент обработчик события
         elements.forEach(element => {
             element.addEventListener('click', (e) => {
                 if (e.target.getAttribute('data-ratio')) {
                     ratio = +e.target.getAttribute('data-ratio');
+                    localStorage.setItem('ratio', ratio); //сохраним выбранные параметры в LocalStorage
                 }else {
                     sex = e.target.getAttribute('id');
+                    localStorage.setItem('sex', sex);   //сохраним выбранные параметры в LocalStorage
                 }
                 elements.forEach(el => {
                     el.classList.remove(activeClass);
@@ -643,12 +677,22 @@ window.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    getStaticInformation('#gender', 'calculating__choose-item_active');
-    getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+    getStaticInformation('#gender div', 'calculating__choose-item_active');
+    getStaticInformation('.calculating__choose_big div', 'calculating__choose-item_active');
 
     function getDynamicInformation(id) {
         const element = document.querySelector(id);
+        
         element.addEventListener('input', (e) => {
+            const input = e.target;
+            //проверка на то, что вводятся числа
+            if (input.value.match(/\D/g)) {
+                input.style.border = '1px solid red';
+                return;
+            } else {
+                input.style.border = 'none';
+            }
+            
             switch (e.target.getAttribute('id')) {
                 case "height":
                     height = +e.target.value;
