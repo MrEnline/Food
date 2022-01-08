@@ -1,4 +1,8 @@
 'use strict'
+
+require('es6-promise').polyfill();
+import 'nodelist-foreach-polyfill';
+
 import  tabs from './modules/tabs';
 import  cards from './modules/cards';
 import  calc from './modules/calc';
